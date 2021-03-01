@@ -1,0 +1,19 @@
+{
+  "name": "@cmgl/freethm",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "@cmgl/vue-pixi": "^1.0.1",
+    "@cmjs/utils": "^1.0.1",
+    "vue": "^3.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.1.4",
+    "@vue/compiler-sfc": "^3.0.5",
+    "vite": "^2.0.1"
+  }
+}
