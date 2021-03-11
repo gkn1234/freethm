@@ -4,7 +4,7 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 10:55:26
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-01 11:52:21
+ * @LastEditTime: 2021-03-04 14:48:56
  */
 import { ref, nextTick } from 'vue'
 import { Tween } from '@cmgl/vue-pixi'
@@ -36,8 +36,6 @@ export default {
     // 页面切换动画
     async function sceneChangeAnimate (target, state = 'enter') {
       const animationName = state === 'enter' ? 'fadeIn' : 'fadeOut'
-      console.log(Tween.ANIMATIONS[animationName])
-      debugger
       await new Tween().on(target).duration(1000).ani(animationName).exec()
     }
     // 初始化场景关闭

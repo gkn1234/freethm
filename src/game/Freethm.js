@@ -4,7 +4,7 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 09:36:24
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-01 11:36:17
+ * @LastEditTime: 2021-03-11 18:53:25
  */
 import { Validator } from '@cmjs/utils'
 import { Game } from '@cmgl/vue-pixi'
@@ -28,8 +28,8 @@ export default function Freethm (selector = null, gameOptions = {}, mapData = {}
   const game = new Game(sysOptions)
 
   // 将重要参数全部挂载在游戏的全局对象上
-  game.use('gameConfig', gameOptions)
-  game.use('mapData', mapData)
+  game.$data.gameConfig = gameOptions
+  game.$data.mapData = mapData
 
   // 屏幕适配
   game.onLandscape(() => {

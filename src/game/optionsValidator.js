@@ -4,7 +4,7 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 09:38:52
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-01 10:52:01
+ * @LastEditTime: 2021-03-09 18:17:23
  */
 import { Validator } from '@cmjs/utils'
 import { getDefaultGameOptions } from './optionsDefault.js'
