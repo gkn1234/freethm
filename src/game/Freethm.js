@@ -4,13 +4,14 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 09:36:24
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-11 18:53:25
+ * @LastEditTime: 2021-03-15 18:53:18
  */
 import { Validator } from '@cmjs/utils'
 import { Game } from '@cmgl/vue-pixi'
 
 import { getDefaultSysOptions, getDefaultGameOptions } from './optionsDefault.js'
-import optionsValidator from './optionsValidator.js'
+import { optionsValidator, mapValidator } from './optionsValidator.js'
+import { Utils } from '@/core/Utils.js'
 import App from './App.vue'
 
 export default function Freethm (selector = null, gameOptions = {}, mapData = {}, sysOptions = {}) {
@@ -23,13 +24,17 @@ export default function Freethm (selector = null, gameOptions = {}, mapData = {}
   sysOptions = Object.assign(getDefaultSysOptions(), sysOptions)
   // 初始化谱面对象
   mapData = Validator.isObject(mapData) ? mapData : {}
+  mapValidator.mount(mapData)
 
   // 初始化游戏对象
   const game = new Game(sysOptions)
 
   // 将重要参数全部挂载在游戏的全局对象上
-  game.$data.gameConfig = gameOptions
-  game.$data.mapData = mapData
+  game.$data.config = gameOptions
+  // 谱面数据挂载到全局对象
+  game.$data.map = mapData
+  // 将公用方法挂载到全局对象
+  game.$data.utils = new Utils(game)
 
   // 屏幕适配
   game.onLandscape(() => {

@@ -4,19 +4,19 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 10:55:26
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-04 14:48:56
+ * @LastEditTime: 2021-03-14 18:14:11
  */
 import { ref, nextTick } from 'vue'
 import { Tween } from '@cmgl/vue-pixi'
 
 import LoadingScene from '@/scenes/LoadingScene/LoadingScene.vue'
-//import GameScene from '@/scenes/GameScene/GameScene.vue'
+import GameScene from '@/scenes/GameScene/GameScene.vue'
 
 export default {
   name: 'App',
   components: {
     LoadingScene,
-    //GameScene
+    GameScene
   },
   setup () {
     // @section 场景管理
@@ -30,13 +30,13 @@ export default {
     async function loadingFinishHandler () {
       await Promise.all([
         closeLoading(),
-        // openGame()
+        openGame()
       ])
     }
     // 页面切换动画
-    async function sceneChangeAnimate (target, state = 'enter') {
+    async function sceneChangeAnimate (target, state = 'enter', duration = 1000) {
       const animationName = state === 'enter' ? 'fadeIn' : 'fadeOut'
-      await new Tween().on(target).duration(1000).ani(animationName).exec()
+      await new Tween().on(target).duration(duration).ani(animationName).exec()
     }
     // 初始化场景关闭
     async function closeLoading () {

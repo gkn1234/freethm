@@ -4,7 +4,7 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 09:39:17
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-01 11:48:43
+ * @LastEditTime: 2021-03-15 17:27:22
  */
 // 系统配置
 export function getDefaultSysOptions () {
@@ -27,9 +27,11 @@ export function getDefaultSysOptions () {
 export function getDefaultGameOptions () {
   return {
     // 资源图集
-    resources: '/assets.json',
+    sheetSrc: '/assets.json',
     // 背景音乐
     bgm: '/bgm/a.mp3',
+    // 背景音乐图片
+    bgmImage: '/kldy.png',
     // 背景图片
     bgImage: '/kldy.png',
     // 背景图片透明度
@@ -75,10 +77,6 @@ export function getDefaultGameOptions () {
     noteMoveTime: 2500,
     // 落键速度(可以设置1/2/3/4/5/6/7/8速)
     noteSpeed: 1,
-    
-    // 延迟参数
-    // 歌曲播放前的空白时间，单位ms，即使不设置，也会强制空出3秒
-    timeBeforeStart: 3000,
     // 按键延迟时间，正数代表按键延后(音乐提前)，负数代表按键提前(音乐延后)。该参数只影响音乐播放时间，不应该影响按键逻辑！！！
     startDelay: 0,
     

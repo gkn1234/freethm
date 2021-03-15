@@ -4,18 +4,20 @@
  * @Author: Guo Kainan
  * @Date: 2021-03-01 09:38:52
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-09 18:17:23
+ * @LastEditTime: 2021-03-15 19:12:55
  */
 import { Validator } from '@cmjs/utils'
 import { getDefaultGameOptions } from './optionsDefault.js'
 
 const defaultOptions = getDefaultGameOptions()
-
-const optionsValidator = new Validator('optionsValidator', {
+// 游戏配置验证
+export const optionsValidator = new Validator('optionsValidator', {
   // 资源图集
-  resources: { type: String, default: defaultOptions.resources },
+  sheetSrc: { type: String, default: defaultOptions.sheetSrc },
   // 背景音乐
   bgm: { type: String, default: defaultOptions.bgm },
+  // 音乐封面
+  bgmImage: { type: String, default: defaultOptions.bgmImage },
   // 背景图片
   bgImage: { type: String, default: defaultOptions.bgImage },
   // 背景图片透明度
@@ -67,10 +69,6 @@ const optionsValidator = new Validator('optionsValidator', {
   noteMoveTime: positiveValid(defaultOptions.noteMoveTime),
   // 落键速度(可以设置1/2/3/4/5/6/7/8速)
   noteSpeed: positiveValid(defaultOptions.noteSpeed),
-  
-  // 延迟参数
-  // 歌曲播放前的空白时间，单位ms，即使不设置，也会强制空出3秒
-  timeBeforeStart: positiveValid(defaultOptions.noteSpeed),
   // 按键延迟时间，正数代表按键延后(音乐提前)，负数代表按键提前(音乐延后)。该参数只影响音乐播放时间，不应该影响按键逻辑！！！
   startDelay: { type: Number, valid: Validator.isValidNum, default: defaultOptions.startDelay },
   
@@ -82,6 +80,24 @@ const optionsValidator = new Validator('optionsValidator', {
   judgeAnimationSrc: stringArrayValid(defaultOptions.judgeAnimationSrc, 5),
   // 判定文字动画，大P，小P，Good，Bad，Miss。不按照此规范赋值，程序将会发生不可预测的错误
   judgeTxtSrc: stringArrayValid(defaultOptions.judgeAnimationSrc, 5),
+})
+
+// 谱面数据验证
+export const mapValidator = new Validator('mapValidator', {
+  // 背景音乐资源
+  bgm: { type: String, default: '' },
+  // 音乐封面资源
+  bgmImage: { type: String, default: '' },
+  // 节奏
+  bpm: { type: Number, default: 150, valid: val => Validator.isPositive(val) },
+  // 歌曲标题
+  title: { type: String, default: '' },
+  // 歌曲难度字符串
+  difficulty: { type: String, default: '' },
+  // 变速对象，以id为键的哈希表
+  speedChanges: { type: Object, default () { return {} } },
+  // 谱面键位序列
+  notes: { type: Array, default () { return [] } }
 })
 
 // 特殊数组验证
@@ -99,5 +115,3 @@ function nonnegativeArrayValid (defaultVal, len) { return arrayValid(defaultVal,
 
 // 验证正数
 function positiveValid (defaultVal) { return { type: Number, valid: Validator.isPositive, default: defaultVal } }
-
-export default optionsValidator

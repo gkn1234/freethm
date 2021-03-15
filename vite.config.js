@@ -4,7 +4,7 @@
  * @Author: Guo Kainan
  * @Date: 2021-02-28 18:28:49
  * @LastEditors: Guo Kainan
- * @LastEditTime: 2021-03-01 11:33:40
+ * @LastEditTime: 2021-03-14 17:37:09
  */
 const path = require('path')
 
@@ -16,7 +16,9 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: [
-      { find: '@', replacement: path.join(__dirname, './src') }
+      { find: '@cmgl/vue-pixi', replacement: path.join(__dirname, './src/libs/index.js') },
+      { find: /^@cmgl\/(.*)/, replacement: path.join(__dirname, './src/libs/$1/index.js') },
+      { find: '@', replacement: path.join(__dirname, './src') },
     ]
   }
 })

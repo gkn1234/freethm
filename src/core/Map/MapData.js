@@ -1,8 +1,8 @@
-import { Game, Validator } from '@/libs/index.js'
+import { Validator } from '@cmjs/utils'
 
-import { mapValidator, speedChangeValidtor, posValidator, noteValidator } from './mapValidator.js'
-import Utils from '../Utils.js'
-import Tap from '../Note/Tap.js'
+import { noteValidator, speedChangeValidtor } from './mapValidator.js'
+import { NOTE_TYPES } from '../Utils.js'
+import Tap from '../note/Tap.js'
 
 let game, mapData
 
@@ -10,28 +10,44 @@ let game, mapData
 const instanceKey = Symbol('instance')
 
 export default class MapData {
-  constructor () {
-    // 单例处理
-    if (MapData[instanceKey]) {
-      return MapData[instanceKey]
-    }
-    MapData[instanceKey] = this
-    
-    game = new Game()
-    mapData = game.getUsed('mapData')
-    mapValidator.mount(mapData)
-    
+  // 实例属性
+  // 游戏对象实例
+  _game = null
+  // 游戏配置，相当于this._game.$data.config
+  _gameConfig = null
+  // 原始谱面数据
+  _mapData = {}
+  
+  // 一分钟节拍数
+  bpm = 150
+  // 歌曲标题
+  title = ''
+  // 歌曲难度说明
+  difficulty = ''
+  // 歌曲资源src
+  bgm = ''
+  // 歌曲封面src
+  bgmImage = ''
+  // 变速对象哈希表，键值是变速对象的id
+  speedChanges = {}
+  // 谱面按键对象列表
+  notes = []
+
+  constructor (game) {
+    this._game = game
+    this._config = game.$data.config
+    this._mapData = game.$data.map
+
+    // 初始化
     this._init()
+
+    // 挂载全新的谱面数据到游戏对象
+    game.$data.map = this
   }
   
   _init () {
-    if (!Validator.isObject(mapData)) {
-      throw new Error('Map data must be an object!')
-    }
-
-    this.bpm = mapData.bpm
-    this.title = mapData.title
-    this.difficulty = mapData.difficulty
+    const mapData = this._mapData
+    Object.assign(this, mapData)
     
     // 处理变速对象
     this._resolveSpeedChange()
@@ -39,31 +55,22 @@ export default class MapData {
     this._resolveNotes()
   }
   
+  // 解析变速对象
   _resolveSpeedChange () {
-    // 第一轮审查，顺带检验变速对象的合法性
-    this.speedChanges = mapData.speedChanges.filter((item) => {
-      speedChangeValidtor.mount(item)
-      // 验证器处理后，如果关键数据非法无法构成合法的变速对象，则关键参数是NaN，或者变速的结尾时间小于变速的起始时间，根据这一点进行过滤
-      return !Number.isNaN(item.speed) && !Number.isNaN(item.start) && !Number.isNaN(item.end) && item.start < item.end
-    })
-    
-    // 按照时间升序排序
-    this.speedChanges.sort((a, b) => {
-      return a.start - b.start
-    })
-    
-    // 第二轮审查，后一个变速的end必须小于前一个变速的start，否则将强制调整
-    for (let i = 0; i < this.speedChanges.length; i++) {
-      let speedObj = this.speedChanges[i]
-      if (i > 0 && speedObj.start < this.speedChanges[i - 1].end) {
-        this.speedChanges[i - 1].end = speedObj.start
+    for (let key in this._mapData.speedChanges) {
+      let speedChange = this._mapData.speedChanges[key]
+      speedChangeValidtor.mount(speedChange)
+      // 如果是不合法的变速数据，关键参数会被校验器置为null
+      if (speedChange.speed !== null && speedChange.start !== null && speedChange.end !== null && speedChange.start < speedChange.end) {
+        // 合法变速存入哈希表
+        this.speedChanges[key] = speedChange
       }
     }
   }
   
   _resolveNotes () {
+    const mapData = this._mapData
     const notes = Validator.isArray(mapData.notes) ? mapData.notes : []
-    this.notes = []
     
     for (let i = 0; i < notes.length; i++) {
       if (!Validator.isObject(notes[i])) { continue }
@@ -77,25 +84,23 @@ export default class MapData {
       }
       */
       
-      // 验证器处理后，如果关键数据非法无法构成谱面对象，则type会是null，time会是NaN，根据这一点进行过滤
-      if (!notes[i].type || Number.isNaN(notes[i].time)) { continue }
+      // 验证器处理后，如果关键数据非法无法构成谱面对象，如type = null，time = null，根据这一点进行过滤
+      if (!notes[i].type || !notes[i].time) { continue }
       
-      let note
       switch (notes[i].type) {
-        case 'Tap':
-          note = new Tap(notes[i], this.speedChanges)
+        case NOTE_TYPES.Tap:
+          this.notes.push(new Tap(notes[i], this.speedChanges, this._game))
           break
-        case 'Slide':
+        case NOTE_TYPES.Slide:
           break
-        case 'Swipe':
+        case NOTE_TYPES.Swipe:
           break
-        case 'Hold':
+        case NOTE_TYPES.Hold:
           break
       }
-      this.notes.push(note)
     }
     
-    // 最后按照时间升序进行排序
+    // 最后按照所有按键的时间升序进行排序
     this.notes.sort((a, b) => {
       return a.start - b.start
     })

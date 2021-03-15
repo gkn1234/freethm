@@ -2,10 +2,25 @@ import { Point } from 'pixi.js'
 
 import { Validator } from '@cmjs/utils'
 
+// 游戏状态
+export const GAME_STATE = {
+  ready: 'ready',
+  play: 'play',
+  auto: 'auto',
+  pause: 'pause',
+  finish: 'finish'
+}
+
+// 按键类型
+export const NOTE_TYPES = {
+  Tap: 'Tap',
+  Slide: 'Slide',
+  Swipe: 'Swipe',
+  Hold: 'Hold'
+}
+
 // 和FR Game实例绑定，用于从config配置中进一步计算得出音游的常用的数据
-export default class Utils {
-  // 合法的按键类型，及其对应的构造函数
-  static NOTE_TYPES = ['Tap', 'Slide', 'Swipe', 'Hold']
+export class Utils {
   // 按键offset偏移到下一轨时的参数
   static OFFSET_TO_NEXT = 4
   // 最大与小轨道数
@@ -19,10 +34,13 @@ export default class Utils {
   // 速度在1速的基础上每增加1，用时减少的比例，最高8速用时比例为 7 / 28，正好是 1 / 4，相当于节奏大师4速
   static SPEED_TIME_FACTOR = 3 / 28
 
+  // 歌曲播放前的空白时间，单位ms，即使不设置，也会强制空出3秒
+  static TIME_BEFORE_START = 3000
+
   // 实例属性
   // 游戏对象实例
   _game = null
-  // 游戏配置，相当于this._game.$data.gameConfig
+  // 游戏配置，相当于this._game.$data.config
   _gameConfig = null
   // 缓存，很多东西不需要再计算
   _cache = {}
@@ -34,7 +52,7 @@ export default class Utils {
   constructor (game) {
     game.$data.utils = this
     this._game = game
-    this._gameConfig = game.$data.gameConfig
+    this._gameConfig = game.$data.config
   }
 
   // 获取常见的位置、尺寸、空间信息
@@ -141,8 +159,11 @@ export default class Utils {
     this._cache.judgeData[level] = res
     return res
   }
+
+  // 静态版本
+  static isValidNoteType (type) { return Object.values(NOTE_TYPES).indexOf(type) >= 0 }
   // prototype版本
-  isValidNoteType (type) { return Utils.NOTE_TYPES.indexOf(type) >= 0 }
+  isValidNoteType (type) { return Utils.isValidNoteType(type) }
 
   /*
     将原始X坐标转换为有效X坐标
